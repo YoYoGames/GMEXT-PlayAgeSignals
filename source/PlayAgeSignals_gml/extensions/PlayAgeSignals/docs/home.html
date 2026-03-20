@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>PlayAgeSignals Extension - GMEXT-PlayAgeSignals</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="assets/css/gmext_style.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PlayAgeSignals Extension";
+        var mkdocs_page_input_path = "home.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/gml.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> GMEXT-PlayAgeSignals
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">PlayAgeSignals Extension</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#structs">Structs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">GMEXT-PlayAgeSignals</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">PlayAgeSignals Extension</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/YoYoGames/GMEXT-PlayAgeSignals/edit/master/docs/home.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a id="top"></a></p>
+<h1 id="play-age-signals-extension"><strong>Play Age Signals Extension</strong></h1>
+<p>Welcome to the Play Age Signals extension wiki!</p>
+<p>Play Age Signals is a GameMaker extension that integrates the
+<a href="https://developer.android.com/google/play/age-signals/use-age-signals-api">Google Play Age Signals API</a>.</p>
+<p>The API allows the application to retrieve signals about the user's age category and supervision status. This is useful for:</p>
+<ul>
+<li>Compliance with child protection regulations</li>
+<li>Restricting features for minors</li>
+<li>Enabling parental supervision flows</li>
+<li>Adjusting content based on age range</li>
+</ul>
+<p>The extension supports:</p>
+<ul>
+<li>Real Play Age Signals API</li>
+<li>FakeAgeSignalsManager for testing (see {func.play_age_signals_test_use_fake_manager})</li>
+</ul>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>
+<p>Age signals may only be available for users in supported
+  regions.</p>
+</li>
+<li>
+<p>Some devices may return <code>API_NOT_AVAILABLE</code> if the Play
+  services version is too old.</p>
+</li>
+</ul>
+<p>Basic example of usage:</p>
+<pre class="highlight"><code class="language-gml">if (play_age_signals_init())
+{
+    play_age_signals_check(function(result)
+    {
+        if (!result.success)
+        {
+            show_debug_message("Error: " + result.error_message);
+            return;
+        }
+
+        switch (result.status)
+        {
+            case PlayAgeSignalsVerificationStatus.VERIFIED:
+                show_debug_message("Adult verified");
+            break;
+
+            case PlayAgeSignalsVerificationStatus.SUPERVISED:
+                show_debug_message("Supervised user");
+            break;
+        }
+    });
+}</code></pre>
+<h2 id="functions">Functions</h2>
+<p>This module offers a collection of functions designed to address specific tasks and provide utilities for various purposes. Explore the available functions to make the most of the functionalities provided by this module.</p>
+<ul>
+<li><a href="home.html#play_age_signals_init">play_age_signals_init</a></li>
+<li><a href="home.html#play_age_signals_is_available">play_age_signals_is_available</a></li>
+<li><a href="home.html#play_age_signals_check">play_age_signals_check</a></li>
+<li><a href="home.html#play_age_signals_test_use_fake_manager">play_age_signals_test_use_fake_manager</a></li>
+<li><a href="home.html#play_age_signals_test_set_result">play_age_signals_test_set_result</a></li>
+<li><a href="home.html#play_age_signals_test_set_error">play_age_signals_test_set_error</a></li>
+</ul>
+<h2 id="structs">Structs</h2>
+<p>This module offers a collection of structs, which serve as custom data models for organizing and structuring data. Explore the provided structs to better understand the relationships between data elements and simplify your data manipulation tasks.</p>
+<ul>
+<li><a href="home.html#playagesignalsresult">PlayAgeSignalsResult</a></li>
+</ul>
+<h2 id="constants">Constants</h2>
+<p>This module includes a set of predefined constants that can be utilized for various purposes. Browse through the available constants to find values relevant to your needs and enhance the efficiency of your code.</p>
+<ul>
+<li><a href="home.html#playagesignalsverificationstatus">PlayAgeSignalsVerificationStatus</a></li>
+<li><a href="home.html#playagesignalserrorcode">PlayAgeSignalsErrorCode</a></li>
+</ul>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_init">play_age_signals_init</h1>
+<p>Initializes the Play Age Signals manager. Returns whether the initialisation was successful.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_init()</code></pre>
+</blockquote>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></p>
+</blockquote>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">if (play_age_signals_init())
+{
+    show_debug_message("Age Signals initialized");
+}</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_is_available">play_age_signals_is_available</h1>
+<p>Checks if the API manager is available.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_is_available()</code></pre>
+</blockquote>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></p>
+</blockquote>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">if (play_age_signals_is_available())
+{
+    show_debug_message("API available");
+}</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_check">play_age_signals_check</h1>
+<p>Requests the age signals information. This is an asynchronous call. You must pass a callback function, which receives a <a href="home.html#playagesignalsresult">PlayAgeSignalsResult</a> struct when it is called.</p>
+<p>This function operates asynchronously, which means that it does not immediately return the requested result. Instead, upon completion of the task, it will trigger the <a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_check(callback)</code></pre>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>callback</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Script_Functions.htm">Function</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<p><strong>Triggers:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>result</td>
+<td><a href="home.html#playagesignalsresult">PlayAgeSignalsResult</a></td>
+<td>The result fo the requested check.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">play_age_signals_check(function(result)
+{
+    if (!result.success)
+    {
+        show_debug_message("Age Signals error: " + string(result.error_code));
+        return;
+    }
+
+    show_debug_message("Status: " + string(result.status));
+    show_debug_message("Age lower: " + string(result.age_lower));
+    show_debug_message("Age upper: " + string(result.age_upper));
+});
+
+/// Example result (success):
+{
+    success: true,
+    status: PlayAgeSignalsVerificationStatus.VERIFIED,
+    age_lower: 18,
+    age_upper: 120,
+    approval_date_ms: -1,
+    install_id: "abc123",
+    error_code: PlayAgeSignalsErrorCode.NO_ERROR,
+    error_message: ""
+}
+
+/// Example result (failure):
+{
+    success: false,
+    status: PlayAgeSignalsVerificationStatus.None,
+    age_lower: -1,
+    age_upper: -1,
+    approval_date_ms: -1,
+    install_id: "",
+    error_code: PlayAgeSignalsErrorCode.API_NOT_AVAILABLE,
+    error_message: "Age Signals API not available"
+}</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_test_use_fake_manager">play_age_signals_test_use_fake_manager</h1>
+<p>Enables or disables the FakeAgeSignalsManager module. This is used for testing the signals API without having to use a real production environment.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_use_fake_manager(enable)</code></pre>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>enable</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_use_fake_manager(true);</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_test_set_result">play_age_signals_test_set_result</h1>
+<p>Sets the next fake test result for success.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_set_result(status, age_lower, age_upper, approval_date_ms, install_id)</code></pre>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td><a href="home.html#playagesignalsverificationstatus">PlayAgeSignalsVerificationStatus</a></td>
+<td>Age verification status.</td>
+</tr>
+<tr>
+<td>age_lower</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Lower bound of the user's age range. -1 if unavailable.</td>
+</tr>
+<tr>
+<td>age_upper</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Upper bound of the user's age range. -1 if unavailable.</td>
+</tr>
+<tr>
+<td>approval_date_ms</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Timestamp (milliseconds since epoch) of the most recent parental approval. -1 if not available.</td>
+</tr>
+<tr>
+<td>install_id</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>Unique identifier associated with the Play Store install.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_set_result(
+    PlayAgeSignalsVerificationStatus.VERIFIED,
+    18,
+    120,
+    -1,
+    "test_install"
+);</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="play_age_signals_test_set_error">play_age_signals_test_set_error</h1>
+<p>Forces the next fake request to return an error.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_set_error(error_code)</code></pre>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>error_code</td>
+<td><a href="home.html#playagesignalserrorcode">PlayAgeSignalsErrorCode</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<pre class="highlight"><code class="language-gml">play_age_signals_test_set_error(
+    PlayAgeSignalsErrorCode.API_NOT_AVAILABLE
+);</code></pre>
+<p><br></p>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="playagesignalsverificationstatus">PlayAgeSignalsVerificationStatus</h1>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="home.html#play_age_signals_test_set_result">play_age_signals_test_set_result</a></li>
+</ul>
+<p>These constants are referenced by the following structs:</p>
+<ul>
+<li><a href="home.html#playagesignalsresult">PlayAgeSignalsResult</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>None</code></td>
+<td>No status available.</td>
+</tr>
+<tr>
+<td><code>VERIFIED</code></td>
+<td>User age has been verified.</td>
+</tr>
+<tr>
+<td><code>SUPERVISED</code></td>
+<td>User account is supervised.</td>
+</tr>
+<tr>
+<td><code>SUPERVISED_APPROVAL_PENDING</code></td>
+<td>Parent approval required.</td>
+</tr>
+<tr>
+<td><code>SUPERVISED_APPROVAL_DENIED</code></td>
+<td>Parent approval denied.</td>
+</tr>
+<tr>
+<td><code>UNKNOWN</code></td>
+<td>Age status unknown.</td>
+</tr>
+<tr>
+<td><code>DECLARED</code></td>
+<td>Age was self-declared.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="playagesignalserrorcode">PlayAgeSignalsErrorCode</h1>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="home.html#play_age_signals_test_set_error">play_age_signals_test_set_error</a></li>
+</ul>
+<p>These constants are referenced by the following structs:</p>
+<ul>
+<li><a href="home.html#playagesignalsresult">PlayAgeSignalsResult</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NO_ERROR</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>API_NOT_AVAILABLE</code></td>
+<td>API not supported on device.</td>
+</tr>
+<tr>
+<td><code>PLAY_STORE_NOT_FOUND</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>NETWORK_ERROR</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PLAY_SERVICES_NOT_FOUND</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>CANNOT_BIND_TO_SERVICE</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PLAY_STORE_VERSION_OUTDATED</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PLAY_SERVICES_VERSION_OUTDATED</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>CLIENT_TRANSIENT_ERROR</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>APP_NOT_OWNED</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>SDK_VERSION_OUTDATED</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>INTERNAL_ERROR</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="playagesignalsresult">PlayAgeSignalsResult</h1>
+<p>Passed as argument into the callback function that is passed into play_age_signals_check().</p>
+<p>This struct is referenced by the following functions:</p>
+<ul>
+<li><a href="home.html#play_age_signals_check">play_age_signals_check</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>success</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></td>
+<td>Indicates if the request succeeded.</td>
+</tr>
+<tr>
+<td>status</td>
+<td><a href="home.html#playagesignalsverificationstatus">PlayAgeSignalsVerificationStatus</a></td>
+<td>Age verification status.</td>
+</tr>
+<tr>
+<td>age_lower</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Lower bound of the user's age range. -1 if unavailable.</td>
+</tr>
+<tr>
+<td>age_upper</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Upper bound of the user's age range. -1 if unavailable.</td>
+</tr>
+<tr>
+<td>approval_date_ms</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>Timestamp (milliseconds since epoch) of the most recent parental approval. -1 if not available.</td>
+</tr>
+<tr>
+<td>install_id</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>Unique identifier associated with the Play Store install.</td>
+</tr>
+<tr>
+<td>error_code</td>
+<td><a href="home.html#playagesignalserrorcode">PlayAgeSignalsErrorCode</a></td>
+<td>Error code if the request failed.</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>Error description.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><p align="center">GameMaker 2026</p></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/YoYoGames/GMEXT-PlayAgeSignals" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/gml.min.js"></script>
+      <script src="assets/js/gmext_script.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
