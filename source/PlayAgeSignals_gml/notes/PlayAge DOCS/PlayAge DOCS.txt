@@ -1,0 +1,329 @@
+============================================================
+PlayAgeSignals Extension Documentation
+============================================================
+
+Description
+------------------------------------------------------------
+PlayAgeSignals is a GameMaker extension that integrates the
+Google Play Age Signals API.
+
+The API allows the application to retrieve signals about the
+user's age category and supervision status. This is useful for:
+
+- Compliance with child protection regulations
+- Restricting features for minors
+- Enabling parental supervision flows
+- Adjusting content based on age range
+
+The extension supports:
+
+- Real Play Age Signals API
+- FakeAgeSignalsManager for testing
+
+
+============================================================
+STRUCTS
+============================================================
+
+PlayAgeSignalsResult
+------------------------------------------------------------
+Returned in the callback of play_age_signals_check().
+
+Fields:
+
+success : bool
+    Indicates if the request succeeded.
+
+status : PlayAgeSignalsVerificationStatus
+    Age verification status.
+
+age_lower : int
+    Lower bound of the user's age range.
+    -1 if unavailable.
+
+age_upper : int
+    Upper bound of the user's age range.
+    -1 if unavailable.
+
+approval_date_ms : real
+    Timestamp (milliseconds since epoch) of the most recent
+    parental approval.
+
+    -1 if not available.
+
+install_id : string
+    Unique identifier associated with the Play Store install.
+
+error_code : PlayAgeSignalsErrorCode
+    Error code if the request failed.
+
+error_message : string
+    Error description.
+
+
+Example result (success):
+
+{
+    success: true,
+    status: PlayAgeSignalsVerificationStatus.VERIFIED,
+    age_lower: 18,
+    age_upper: 120,
+    approval_date_ms: -1,
+    install_id: "abc123",
+    error_code: PlayAgeSignalsErrorCode.NO_ERROR,
+    error_message: ""
+}
+
+Example result (failure):
+
+{
+    success: false,
+    status: PlayAgeSignalsVerificationStatus.None,
+    age_lower: -1,
+    age_upper: -1,
+    approval_date_ms: -1,
+    install_id: "",
+    error_code: PlayAgeSignalsErrorCode.API_NOT_AVAILABLE,
+    error_message: "Age Signals API not available"
+}
+
+
+============================================================
+FUNCTIONS
+============================================================
+
+play_age_signals_init()
+------------------------------------------------------------
+Initializes the Play Age Signals manager.
+
+Returns:
+    bool
+
+Example:
+
+if (play_age_signals_init())
+{
+    show_debug_message("Age Signals initialized");
+}
+
+
+------------------------------------------------------------
+
+play_age_signals_is_available()
+------------------------------------------------------------
+Checks if the API manager is available.
+
+Returns:
+    bool
+
+
+Example:
+
+if (play_age_signals_is_available())
+{
+    show_debug_message("API available");
+}
+
+
+------------------------------------------------------------
+
+play_age_signals_check(callback)
+------------------------------------------------------------
+Requests the age signals information.
+
+This is an asynchronous call.
+
+callback receives a single parameter:
+    PlayAgeSignalsResult struct
+
+Parameters:
+    callback : function
+
+
+Example:
+
+play_age_signals_check(function(result)
+{
+    if (!result.success)
+    {
+        show_debug_message("Age Signals error: " + string(result.error_code));
+        return;
+    }
+
+    show_debug_message("Status: " + string(result.status));
+    show_debug_message("Age lower: " + string(result.age_lower));
+    show_debug_message("Age upper: " + string(result.age_upper));
+});
+
+
+============================================================
+TESTING FUNCTIONS
+============================================================
+
+These functions allow testing without requiring
+Google Play production environments.
+
+
+------------------------------------------------------------
+
+play_age_signals_test_use_fake_manager(enable)
+------------------------------------------------------------
+
+Enables or disables FakeAgeSignalsManager.
+
+Parameters:
+    enable : bool
+
+Example:
+
+play_age_signals_test_use_fake_manager(true);
+
+
+------------------------------------------------------------
+
+play_age_signals_test_set_result(status, age_lower, age_upper,
+approval_date_ms, install_id)
+------------------------------------------------------------
+
+Sets the next fake success result.
+
+Parameters:
+
+status : PlayAgeSignalsVerificationStatus
+age_lower : int
+age_upper : int
+approval_date_ms : real
+install_id : string
+
+Example:
+
+play_age_signals_test_set_result(
+    PlayAgeSignalsVerificationStatus.VERIFIED,
+    18,
+    120,
+    -1,
+    "test_install"
+);
+
+
+------------------------------------------------------------
+
+play_age_signals_test_set_error(error_code)
+------------------------------------------------------------
+
+Forces the next request to return an error.
+
+Parameters:
+
+error_code : PlayAgeSignalsErrorCode
+
+Example:
+
+play_age_signals_test_set_error(
+    PlayAgeSignalsErrorCode.API_NOT_AVAILABLE
+);
+
+
+============================================================
+ENUMS
+============================================================
+
+PlayAgeSignalsVerificationStatus
+------------------------------------------------------------
+
+None = -1
+    No status available.
+
+VERIFIED = 0
+    User age has been verified.
+
+SUPERVISED = 1
+    User account is supervised.
+
+SUPERVISED_APPROVAL_PENDING = 2
+    Parent approval required.
+
+SUPERVISED_APPROVAL_DENIED = 3
+    Parent approval denied.
+
+UNKNOWN = 4
+    Age status unknown.
+
+DECLARED = 5
+    Age was self-declared.
+
+
+------------------------------------------------------------
+
+PlayAgeSignalsErrorCode
+------------------------------------------------------------
+
+NO_ERROR = 0
+
+API_NOT_AVAILABLE = -1
+    API not supported on device.
+
+PLAY_STORE_NOT_FOUND = -2
+
+NETWORK_ERROR = -3
+
+PLAY_SERVICES_NOT_FOUND = -4
+
+CANNOT_BIND_TO_SERVICE = -5
+
+PLAY_STORE_VERSION_OUTDATED = -6
+
+PLAY_SERVICES_VERSION_OUTDATED = -7
+
+CLIENT_TRANSIENT_ERROR = -8
+
+APP_NOT_OWNED = -9
+
+SDK_VERSION_OUTDATED = -10
+
+INTERNAL_ERROR = -100
+
+
+============================================================
+Typical Usage
+============================================================
+
+if (play_age_signals_init())
+{
+    play_age_signals_check(function(result)
+    {
+        if (!result.success)
+        {
+            show_debug_message("Error: " + result.error_message);
+            return;
+        }
+
+        switch (result.status)
+        {
+            case PlayAgeSignalsVerificationStatus.VERIFIED:
+                show_debug_message("Adult verified");
+            break;
+
+            case PlayAgeSignalsVerificationStatus.SUPERVISED:
+                show_debug_message("Supervised user");
+            break;
+        }
+    });
+}
+
+
+============================================================
+Notes
+============================================================
+
+- Age signals may only be available for users in supported
+  regions.
+
+- Some devices may return API_NOT_AVAILABLE if the Play
+  services version is too old.
+
+- The testing API (FakeAgeSignalsManager) allows development
+  without requiring production Google Play distribution.
+
+
+============================================================

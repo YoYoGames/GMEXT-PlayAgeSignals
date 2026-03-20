@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"PlayAgeSignals_API",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"PlayAgeSignals_API",
+  "parent":{
+    "name":"PlayAgeSignals",
+    "path":"folders/PlayAgeSignals.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
