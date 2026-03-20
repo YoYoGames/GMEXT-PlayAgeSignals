@@ -215,29 +215,29 @@
 /**
  * @const PlayAgeSignalsVerificationStatus
  * @member None No status available.
- * @member VERIFIED User age has been verified.
- * @member SUPERVISED User account is supervised.
- * @member SUPERVISED_APPROVAL_PENDING Parent approval required.
- * @member SUPERVISED_APPROVAL_DENIED Parent approval denied.
- * @member UNKNOWN Age status unknown.
- * @member DECLARED Age was self-declared.
+ * @member Verified User age has been verified.
+ * @member Supervised User account is supervised.
+ * @member SupervisedApprovalPending Parent approval required.
+ * @member SupervisedApprovalDenied Parent approval denied.
+ * @member Unknown Age status unknown.
+ * @member Declared Age was self-declared.
  * @const_end
  */
 
 /**
  * @const PlayAgeSignalsErrorCode
- * @member NO_ERROR
- * @member API_NOT_AVAILABLE API not supported on device.
- * @member PLAY_STORE_NOT_FOUND
- * @member NETWORK_ERROR
- * @member PLAY_SERVICES_NOT_FOUND
- * @member CANNOT_BIND_TO_SERVICE
- * @member PLAY_STORE_VERSION_OUTDATED
- * @member PLAY_SERVICES_VERSION_OUTDATED
- * @member CLIENT_TRANSIENT_ERROR
- * @member APP_NOT_OWNED
- * @member SDK_VERSION_OUTDATED
- * @member INTERNAL_ERROR
+ * @member NoError
+ * @member ApiNotAvailable API not supported on device.
+ * @member PlayStoreNotFound
+ * @member NetworkError
+ * @member PlayServicesNotFound
+ * @member CannotBindToService
+ * @member PlayStoreVersionOutdated
+ * @member PlayServicesVersionOutdated
+ * @member ClientTransientError
+ * @member AppNotOwned
+ * @member SdkVersionOutdated
+ * @member InternalError
  * @const_end
  */
 
