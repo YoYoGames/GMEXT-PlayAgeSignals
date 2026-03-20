@@ -1,5 +1,5 @@
 play_age_signals_test_set_result(
-    PlayAgeSignalsVerificationStatus.SUPERVISED,
+    PlayAgeSignalsVerificationStatus.Supervised,
     13,
     17,
     -1,

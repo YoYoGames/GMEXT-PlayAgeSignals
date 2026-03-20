@@ -11,28 +11,28 @@
 enum PlayAgeSignalsVerificationStatus
 {
     None = -1,
-    VERIFIED = 0,
-    SUPERVISED = 1,
-    SUPERVISED_APPROVAL_PENDING = 2,
-    SUPERVISED_APPROVAL_DENIED = 3,
-    UNKNOWN = 4,
-    DECLARED = 5
+    Verified = 0,
+    Supervised = 1,
+    SupervisedApprovalPending = 2,
+    SupervisedApprovalDenied = 3,
+    Unknown = 4,
+    Declared = 5
 }
 
 enum PlayAgeSignalsErrorCode
 {
-    NO_ERROR = 0,
-    API_NOT_AVAILABLE = -1,
-    PLAY_STORE_NOT_FOUND = -2,
-    NETWORK_ERROR = -3,
-    PLAY_SERVICES_NOT_FOUND = -4,
-    CANNOT_BIND_TO_SERVICE = -5,
-    PLAY_STORE_VERSION_OUTDATED = -6,
-    PLAY_SERVICES_VERSION_OUTDATED = -7,
-    CLIENT_TRANSIENT_ERROR = -8,
-    APP_NOT_OWNED = -9,
-    SDK_VERSION_OUTDATED = -10,
-    INTERNAL_ERROR = -100
+    NoError = 0,
+    ApiNotAvailable = -1,
+    PlayStoreNotFound = -2,
+    NetworkError = -3,
+    PlayServicesNotFound = -4,
+    CannotBindToService = -5,
+    PlayStoreVersionOutdated = -6,
+    PlayServicesVersionOutdated = -7,
+    ClientTransientError = -8,
+    AppNotOwned = -9,
+    SdkVersionOutdated = -10,
+    InternalError = -100
 }
 
 // #####################################################################

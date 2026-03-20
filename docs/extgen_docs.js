@@ -54,29 +54,29 @@
 /**
  * @enum_partial PlayAgeSignalsVerificationStatus
  * @member None
- * @member VERIFIED
- * @member SUPERVISED
- * @member SUPERVISED_APPROVAL_PENDING
- * @member SUPERVISED_APPROVAL_DENIED
- * @member UNKNOWN
- * @member DECLARED
+ * @member Verified
+ * @member Supervised
+ * @member SupervisedApprovalPending
+ * @member SupervisedApprovalDenied
+ * @member Unknown
+ * @member Declared
  * @enum_end 
  */
 
 /**
  * @enum_partial PlayAgeSignalsErrorCode
- * @member NO_ERROR
- * @member API_NOT_AVAILABLE
- * @member PLAY_STORE_NOT_FOUND
- * @member NETWORK_ERROR
- * @member PLAY_SERVICES_NOT_FOUND
- * @member CANNOT_BIND_TO_SERVICE
- * @member PLAY_STORE_VERSION_OUTDATED
- * @member PLAY_SERVICES_VERSION_OUTDATED
- * @member CLIENT_TRANSIENT_ERROR
- * @member APP_NOT_OWNED
- * @member SDK_VERSION_OUTDATED
- * @member INTERNAL_ERROR
+ * @member NoError
+ * @member ApiNotAvailable
+ * @member PlayStoreNotFound
+ * @member NetworkError
+ * @member PlayServicesNotFound
+ * @member CannotBindToService
+ * @member PlayStoreVersionOutdated
+ * @member PlayServicesVersionOutdated
+ * @member ClientTransientError
+ * @member AppNotOwned
+ * @member SdkVersionOutdated
+ * @member InternalError
  * @enum_end 
  */
 

@@ -1,5 +1,5 @@
 
-play_age_signals_test_set_error(PlayAgeSignalsErrorCode.NETWORK_ERROR);
+play_age_signals_test_set_error(PlayAgeSignalsErrorCode.NetworkError);
 
 play_age_signals_check(function(playAgeSignalsResult)
 	{

@@ -69,7 +69,7 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
         if (!play_age_signals_init()) {
             if (callback != null) {
                 callback.call(makeErrorResult(
-                    PlayAgeSignalsErrorCode.INTERNAL_ERROR,
+                    PlayAgeSignalsErrorCode.InternalError,
                     "Failed to initialize Play Age Signals manager"
                 ));
             }
@@ -82,7 +82,7 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             if (mFakeAgeSignalsManager == null) {
                 if (callback != null) {
                     callback.call(makeErrorResult(
-                        PlayAgeSignalsErrorCode.INTERNAL_ERROR,
+                        PlayAgeSignalsErrorCode.InternalError,
                         "FakeAgeSignalsManager is not initialized"
                     ));
                 }
@@ -100,7 +100,7 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
         if (mAgeSignalsManager == null) {
             if (callback != null) {
                 callback.call(makeErrorResult(
-                    PlayAgeSignalsErrorCode.INTERNAL_ERROR,
+                    PlayAgeSignalsErrorCode.InternalError,
                     "AgeSignalsManager is not initialized"
                 ));
             }
@@ -180,7 +180,7 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
     private void handleFailure(GMFunction callback, Exception exception) {
         if (callback == null) return;
 
-        PlayAgeSignalsErrorCode errorCode = PlayAgeSignalsErrorCode.INTERNAL_ERROR;
+        PlayAgeSignalsErrorCode errorCode = PlayAgeSignalsErrorCode.InternalError;
         String message = "Unknown Play Age Signals error";
 
         if (exception instanceof AgeSignalsException) {
@@ -205,7 +205,7 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             nullableInt(result.ageUpper(), -1),
             nullableDateToMs(result.mostRecentApprovalDate()),
             safeString(result.installId()),
-            PlayAgeSignalsErrorCode.NO_ERROR,
+            PlayAgeSignalsErrorCode.NoError,
             ""
         );
     }
@@ -230,22 +230,22 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
 
         switch (status) {
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.VERIFIED:
-                return PlayAgeSignalsVerificationStatus.VERIFIED;
+                return PlayAgeSignalsVerificationStatus.Verified;
 
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED:
-                return PlayAgeSignalsVerificationStatus.SUPERVISED;
+                return PlayAgeSignalsVerificationStatus.Supervised;
 
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED_APPROVAL_PENDING:
-                return PlayAgeSignalsVerificationStatus.SUPERVISED_APPROVAL_PENDING;
+                return PlayAgeSignalsVerificationStatus.SupervisedApprovalPending;
 
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED_APPROVAL_DENIED:
-                return PlayAgeSignalsVerificationStatus.SUPERVISED_APPROVAL_DENIED;
+                return PlayAgeSignalsVerificationStatus.SupervisedApprovalDenied;
 
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.UNKNOWN:
-                return PlayAgeSignalsVerificationStatus.UNKNOWN;
+                return PlayAgeSignalsVerificationStatus.Unknown;
 
             case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.DECLARED:
-                return PlayAgeSignalsVerificationStatus.DECLARED;
+                return PlayAgeSignalsVerificationStatus.Declared;
 
             default:
                 return PlayAgeSignalsVerificationStatus.None;
@@ -255,41 +255,41 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
     private PlayAgeSignalsErrorCode mapErrorCodeEnum(int errorCode) {
         switch (errorCode) {
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.NO_ERROR:
-                return PlayAgeSignalsErrorCode.NO_ERROR;
+                return PlayAgeSignalsErrorCode.NoError;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.API_NOT_AVAILABLE:
-                return PlayAgeSignalsErrorCode.API_NOT_AVAILABLE;
+                return PlayAgeSignalsErrorCode.ApiNotAvailable;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.PLAY_STORE_NOT_FOUND:
-                return PlayAgeSignalsErrorCode.PLAY_STORE_NOT_FOUND;
+                return PlayAgeSignalsErrorCode.PlayStoreNotFound;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.NETWORK_ERROR:
-                return PlayAgeSignalsErrorCode.NETWORK_ERROR;
+                return PlayAgeSignalsErrorCode.NetworkError;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.PLAY_SERVICES_NOT_FOUND:
-                return PlayAgeSignalsErrorCode.PLAY_SERVICES_NOT_FOUND;
+                return PlayAgeSignalsErrorCode.PlayServicesNotFound;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.CANNOT_BIND_TO_SERVICE:
-                return PlayAgeSignalsErrorCode.CANNOT_BIND_TO_SERVICE;
+                return PlayAgeSignalsErrorCode.CannotBindToService;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.PLAY_STORE_VERSION_OUTDATED:
-                return PlayAgeSignalsErrorCode.PLAY_STORE_VERSION_OUTDATED;
+                return PlayAgeSignalsErrorCode.PlayStoreVersionOutdated;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.PLAY_SERVICES_VERSION_OUTDATED:
-                return PlayAgeSignalsErrorCode.PLAY_SERVICES_VERSION_OUTDATED;
+                return PlayAgeSignalsErrorCode.PlayServicesVersionOutdated;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.CLIENT_TRANSIENT_ERROR:
-                return PlayAgeSignalsErrorCode.CLIENT_TRANSIENT_ERROR;
+                return PlayAgeSignalsErrorCode.ClientTransientError;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.APP_NOT_OWNED:
-                return PlayAgeSignalsErrorCode.APP_NOT_OWNED;
+                return PlayAgeSignalsErrorCode.AppNotOwned;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.SDK_VERSION_OUTDATED:
-                return PlayAgeSignalsErrorCode.SDK_VERSION_OUTDATED;
+                return PlayAgeSignalsErrorCode.SdkVersionOutdated;
 
             case com.google.android.play.agesignals.model.AgeSignalsErrorCode.INTERNAL_ERROR:
             default:
-                return PlayAgeSignalsErrorCode.INTERNAL_ERROR;
+                return PlayAgeSignalsErrorCode.InternalError;
         }
     }
 
