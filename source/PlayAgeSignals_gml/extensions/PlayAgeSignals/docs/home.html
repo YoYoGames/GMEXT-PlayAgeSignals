@@ -91,7 +91,7 @@
 <p>The extension supports:</p>
 <ul>
 <li>Real Play Age Signals API</li>
-<li>FakeAgeSignalsManager for testing (see {func.play_age_signals_test_use_fake_manager})</li>
+<li>FakeAgeSignalsManager for testing (see <a href="home.html#play_age_signals_test_use_fake_manager">play_age_signals_test_use_fake_manager</a>)</li>
 </ul>
 <h2 id="notes">Notes</h2>
 <ul>
@@ -117,11 +117,11 @@
 
         switch (result.status)
         {
-            case PlayAgeSignalsVerificationStatus.VERIFIED:
+            case PlayAgeSignalsVerificationStatus.Verified:
                 show_debug_message("Adult verified");
             break;
 
-            case PlayAgeSignalsVerificationStatus.SUPERVISED:
+            case PlayAgeSignalsVerificationStatus.Supervised:
                 show_debug_message("Supervised user");
             break;
         }
@@ -272,12 +272,12 @@
 /// Example result (success):
 {
     success: true,
-    status: PlayAgeSignalsVerificationStatus.VERIFIED,
+    status: PlayAgeSignalsVerificationStatus.Verified,
     age_lower: 18,
     age_upper: 120,
     approval_date_ms: -1,
     install_id: "abc123",
-    error_code: PlayAgeSignalsErrorCode.NO_ERROR,
+    error_code: PlayAgeSignalsErrorCode.NoError,
     error_message: ""
 }
 
@@ -289,7 +289,7 @@
     age_upper: -1,
     approval_date_ms: -1,
     install_id: "",
-    error_code: PlayAgeSignalsErrorCode.API_NOT_AVAILABLE,
+    error_code: PlayAgeSignalsErrorCode.ApiNotAvailable,
     error_message: "Age Signals API not available"
 }</code></pre>
 <p><br></p>
@@ -388,7 +388,7 @@
 <p><br></p>
 <p><strong>Example:</strong></p>
 <pre class="highlight"><code class="language-gml">play_age_signals_test_set_result(
-    PlayAgeSignalsVerificationStatus.VERIFIED,
+    PlayAgeSignalsVerificationStatus.Verified,
     18,
     120,
     -1,
@@ -432,7 +432,7 @@
 <p><br></p>
 <p><strong>Example:</strong></p>
 <pre class="highlight"><code class="language-gml">play_age_signals_test_set_error(
-    PlayAgeSignalsErrorCode.API_NOT_AVAILABLE
+    PlayAgeSignalsErrorCode.ApiNotAvailable
 );</code></pre>
 <p><br></p>
 <p><br></p>
