@@ -16,7 +16,7 @@
  * The extension supports:
  * 
  * - Real Play Age Signals API
- * - FakeAgeSignalsManager for testing (see {func.play_age_signals_test_use_fake_manager})
+ * - FakeAgeSignalsManager for testing (see ${func.play_age_signals_test_use_fake_manager})
  * 
  * ## Notes
  * 
@@ -41,11 +41,11 @@
  * 
  *         switch (result.status)
  *         {
- *             case PlayAgeSignalsVerificationStatus.VERIFIED:
+ *             case PlayAgeSignalsVerificationStatus.Verified:
  *                 show_debug_message("Adult verified");
  *             break;
  * 
- *             case PlayAgeSignalsVerificationStatus.SUPERVISED:
+ *             case PlayAgeSignalsVerificationStatus.Supervised:
  *                 show_debug_message("Supervised user");
  *             break;
  *         }
@@ -129,12 +129,12 @@
  * /// Example result (success):
  * {
  *     success: true,
- *     status: PlayAgeSignalsVerificationStatus.VERIFIED,
+ *     status: PlayAgeSignalsVerificationStatus.Verified,
  *     age_lower: 18,
  *     age_upper: 120,
  *     approval_date_ms: -1,
  *     install_id: "abc123",
- *     error_code: PlayAgeSignalsErrorCode.NO_ERROR,
+ *     error_code: PlayAgeSignalsErrorCode.NoError,
  *     error_message: ""
  * }
  * 
@@ -146,7 +146,7 @@
  *     age_upper: -1,
  *     approval_date_ms: -1,
  *     install_id: "",
- *     error_code: PlayAgeSignalsErrorCode.API_NOT_AVAILABLE,
+ *     error_code: PlayAgeSignalsErrorCode.ApiNotAvailable,
  *     error_message: "Age Signals API not available"
  * }
  * ```
@@ -175,7 +175,7 @@
  * @example
  * ```gml
  * play_age_signals_test_set_result(
- *     PlayAgeSignalsVerificationStatus.VERIFIED,
+ *     PlayAgeSignalsVerificationStatus.Verified,
  *     18,
  *     120,
  *     -1,
@@ -192,7 +192,7 @@
  * @example
  * ```gml
  * play_age_signals_test_set_error(
- *     PlayAgeSignalsErrorCode.API_NOT_AVAILABLE
+ *     PlayAgeSignalsErrorCode.ApiNotAvailable
  * );
  * ```
  * @func_end
