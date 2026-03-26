@@ -1,5 +1,7 @@
 
-// This needs to go into the Extension Core script, so it doesn't impact with previous extensions
+// #############################################################################
+// # GMExtCore
+// #############################################################################
 
 #macro EXT_CORE_GM_TYPE_STRUCT (255)
 #macro EXT_CORE_GM_TYPE_ARRAY (254)
@@ -201,20 +203,25 @@ function __ext_core_get_ret_buffer(_request_size = undefined) {
 	return __internal_ret;
 }
 
+/// @desc Returns the global buffer used for handling async calls from extensions.
+/// @param {Real} _request_size Request for the buffer to be resized
+/// @returns {Id.Buffer}
+/// @ignore
+function __ext_core_get_async_buffer(_request_size = undefined) {
+	static __internal_async = buffer_create(EXT_CORE_GM_BUFFER_RETURN_SIZE, buffer_grow, 1);
+	if (!is_undefined(_request_size)) buffer_resize(__internal_async, _request_size);
+	
+	buffer_seek(__internal_async, buffer_seek_start, 0);
+	buffer_poke(__internal_async, 0, buffer_u8, EXT_CORE_GM_TYPE_UNDEFINED);
+	return __internal_async;
+}
+
 /// @desc Returns the map that keeps all the registered GML side function references passed to extensions.
 /// @returns {Id.DsMap}
 /// @ignore
 function __ext_core_function_map() {
 	static __internal_map = ds_map_create();
 	return __internal_map;
-}
-
-/// @desc Represents a GML function reference to be used by the extension callback system.
-/// @param {Function} _callable The function to create a reference for.
-/// @ignore
-function __GMFunctionRef(_callable) constructor {
-	callable = _callable;
-	count = 1;
 }
 
 /// @desc A native function dispatcher that manages the polling and lifecycle of functions registered
@@ -241,7 +248,7 @@ function __GMNativeFunctionDispatcher(_handler, _decoders) constructor {
 	}, [], -1);
 	
 	/// @func dispatch(_amount)
-	/// @desc Increments the internal reference count and ensures the dispatcher’s time source is running.
+	/// @desc Increments the internal reference count and ensures the dispatcher�s time source is running.
     /// Should be called whenever a new function is registered on the GML side.
     /// @param {Real} [_amount=1] The number of active references to add.
 	static dispatch = function(_amount = 1) {
@@ -258,13 +265,21 @@ function __GMNativeFunctionDispatcher(_handler, _decoders) constructor {
 /// @ignore
 function __ext_core_function_register(_callable, _dispatcher) {
 	var _map = __ext_core_function_map();
-		
-	// Create internal reference (allows duplicated refs)
-	var _ref = new __GMFunctionRef(_callable);
-	var _handle = int64(ptr(_ref));
+    
+    var _handle = int64(ptr(_callable));
+    var _ref = ds_map_find_value(_map, _handle);
+    if (!is_undefined(_ref)) {
+        // Already registered increase the refcount
+        _ref[1 /* ref count */] += 1;
+    }
+    else
+    {
+        // Create a new ref
+    	_ref = [_callable /* callable */, 1 /* ref count */];
+    	ds_map_add(_map, _handle, _ref);
+    }
 
-	ds_map_add(_map, _handle, _ref);
-
+    // Make sure we kick the dispatcher (we might be in pause mode)
 	_dispatcher.dispatch();
 
 	return _handle;
@@ -277,7 +292,8 @@ function __ext_core_function_register(_callable, _dispatcher) {
 /// @ignore
 function __ext_core_function_dispatch_calls(_handler, _decoders) {
 
-	var _buf = __ext_core_get_ret_buffer();
+    static _dummy_context = {};
+	var _buf = __ext_core_get_async_buffer();
 	var _size = _handler(buffer_get_address(_buf), buffer_get_size(_buf));
 		
 	// Nothing to handle
@@ -286,7 +302,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 	// Not enough space in the buffer
 	if (_size < 0) {
 		// Request a buffer resize
-		_buf = __ext_core_get_ret_buffer(-_size + 3 /* 1 type + 2 size */);
+		_buf = __ext_core_get_async_buffer(-_size + 3 /* 1 type + 2 size */);
 		// This call will always succeed cus it will get the temp packed array
 		_handler(buffer_get_address(_buf), buffer_get_size(_buf));
 	}
@@ -300,24 +316,26 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 	
 	// Read the size of callbacks to be triggered this frame
 	var _count = buffer_read(_buf, buffer_u16);
-	var _ref_map = __ext_core_function_map(); // Cache the __GMFunctionRef map
+	var _ref_map = __ext_core_function_map(); // Cache the ref map
 	repeat (_count) {
 			
-		var _ref = buffer_read(_buf, buffer_u64); // Decode the map key (ref)
+		var _handle = buffer_read(_buf, buffer_u64); // Decode the map key (ref)
 		var _command = buffer_read(_buf, buffer_u8); // Decode the command (execute|release)
 		
+        var _ref = ds_map_find_value(_ref_map, _handle); // Get the map value
+        if (is_undefined(_ref)) continue; // Continue if there is no func data
+        
 		switch (_command) {
 			case 1: // execute
-				var _func = ds_map_find_value(_ref_map, _ref); // Get the map value
-		
-				if (is_undefined(_func)) continue; // Continue if there is no func data
-		
 				var _args = __ext_core_buffer_unmarshal_value(_buf, _decoders); // Unmarshal the args
-				method_call(_func.callable, _args); // Call the method with argument array
+				with (_dummy_context) method_call(_ref[0 /* callable */], _args); // Call the method with argument array
 				break;
 			case 2: // release
-				ds_map_delete(_ref_map, _ref); // Remove the entry from the map	
-				_released++;
+                var _ref_count = --_ref[1 /* ref count */];
+                if (_ref_count <= 0) {
+    				ds_map_delete(_ref_map, _handle); // Remove the entry from the map
+                }
+                _released++;
 				break;
 			
 		}

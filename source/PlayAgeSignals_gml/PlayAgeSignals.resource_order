@@ -1,4 +1,7 @@
 {
   "FolderOrderSettings":[],
-  "ResourceOrderSettings":[],
+  "ResourceOrderSettings":[
+    {"name":"ExtensionCore","order":1,"path":"extensions/ExtensionCore/ExtensionCore.yy",},
+    {"name":"ExtensionCore_api","order":2,"path":"scripts/ExtensionCore_api/ExtensionCore_api.yy",},
+  ],
 }
