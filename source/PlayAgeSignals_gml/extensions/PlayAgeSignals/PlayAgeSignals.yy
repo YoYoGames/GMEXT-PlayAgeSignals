@@ -14,7 +14,7 @@
   "copyToTargets":8,
   "description":"",
   "exportToGame":true,
-  "extensionVersion":"0.0.1",
+  "extensionVersion":"0.0.2",
   "files":[
     {"$GMExtensionFile":"v1","%Name":"","constants":[],"copyToTargets":-1,"filename":"PlayAgeSignals.ext","final":"","functions":[
         {"$GMExtensionFunction":"","%Name":"play_age_signals_init","argCount":0,"args":[],"documentation":"@returns {Real}","externalName":"__EXT_NATIVE__play_age_signals_init","help":"","hidden":false,"kind":4,"name":"play_age_signals_init","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":2,},
