@@ -7,8 +7,9 @@ import java.util.*;
 import ${YYAndroidPackageName}.GMExtWire;
 import ${YYAndroidPackageName}.GMExtWire.GMFunction;
 import ${YYAndroidPackageName}.GMExtWire.GMValue;
-import ${YYAndroidPackageName}.enums.*;
 import ${YYAndroidPackageName}.records.*;
+import ${YYAndroidPackageName}.codecs.*;
+import ${YYAndroidPackageName}.enums.*;
 
 public abstract class PlayAgeSignalsInternal extends RunnerSocial implements PlayAgeSignalsInterface {
 

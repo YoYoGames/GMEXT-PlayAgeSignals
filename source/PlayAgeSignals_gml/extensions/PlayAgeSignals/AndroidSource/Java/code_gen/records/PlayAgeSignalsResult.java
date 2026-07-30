@@ -12,7 +12,7 @@ public record PlayAgeSignalsResult(boolean success, PlayAgeSignalsVerificationSt
 {
     public static final int CODEC_ID = 0;
     @Override
-    public void encode(ByteBuffer b)
+    public void encode(GMExtWire.IByteWriter b)
     {
         PlayAgeSignalsResultCodec.write(b, this);
     }

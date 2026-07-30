@@ -33,7 +33,7 @@ public final class PlayAgeSignalsResultCodec {
         return new PlayAgeSignalsResult(success, status, age_lower, age_upper, approval_date_ms, install_id, error_code, error_message);
     }
 
-    public static void write(ByteBuffer b, PlayAgeSignalsResult obj)
+    public static void write(GMExtWire.IByteWriter b, PlayAgeSignalsResult obj)
     {
         GMExtWire.writeBool(b, obj.success());
 
