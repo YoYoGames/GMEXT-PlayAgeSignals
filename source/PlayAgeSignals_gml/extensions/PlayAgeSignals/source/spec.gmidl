@@ -2,30 +2,49 @@
 module PlayAgeSignals;
 
 [global, bind = typed_gml]
-class `[[PlayAgeSignalsResult]]` prototype Object
+class `[[PlayAgeSignalsAccessResult]]` prototype Object
 {
-	[field]
+    [field]
     property success: bool { get; set; }
 
-    [field, type_hint=`PlayAgeSignalsVerificationStatus`]
+    [field, type_hint=`PlayAgeSignalsStatus`]
     property status: int32 { get; set; }
 
-	[field]
+    [field, type_hint=`PlayAgeSignalsErrorCode`]
+    property error_code: int32 { get; set; }
+
+    [field]
+    property error_message: string { get; set; }
+}
+
+[global, bind = typed_gml]
+class `[[PlayAgeSignalsResult]]` prototype Object
+{
+    [field]
+    property success: bool { get; set; }
+
+    [field, type_hint=`PlayAgeSignalsAgeRangeSource`]
+    property age_range_source: int32 { get; set; }
+
+    [field]
     property age_lower: int32 { get; set; }
 
-	[field]
+    [field]
     property age_upper: int32 { get; set; }
 
-	[field]
-    property approval_date_ms: real { get; set; }
+    [field, type_hint=`PlayAgeSignalsSignificantChangeStatus`]
+    property significant_change_status: int32 { get; set; }
 
-	[field]
+    [field]
+    property significant_change_approval_date_ms: real { get; set; }
+
+    [field]
     property install_id: string { get; set; }
 
     [field, type_hint=`PlayAgeSignalsErrorCode`]
     property error_code: int32 { get; set; }
 
-	[field]
+    [field]
     property error_message: string { get; set; }
 }
 
@@ -39,6 +58,9 @@ function play_age_signals_init(): bool;
 function play_age_signals_is_available(): bool;
 
 [global, bind = typed_gml]
+function play_age_signals_request_access(callback: func): unit;
+
+[global, bind = typed_gml]
 function play_age_signals_check(callback: func): unit;
 
 
@@ -48,11 +70,17 @@ function play_age_signals_check(callback: func): unit;
 function play_age_signals_test_use_fake_manager(enable: bool): unit;
 
 [global, bind = typed_gml]
+function play_age_signals_test_set_access_result(
+    [type_hint=`PlayAgeSignalsStatus`] status
+): unit;
+
+[global, bind = typed_gml]
 function play_age_signals_test_set_result(
-    [type_hint=`PlayAgeSignalsVerificationStatus`] status,
+    [type_hint=`PlayAgeSignalsAgeRangeSource`] age_range_source,
     age_lower: int32,
     age_upper: int32,
-    approval_date_ms: real,
+    [type_hint=`PlayAgeSignalsSignificantChangeStatus`] significant_change_status,
+    significant_change_approval_date_ms: real,
     install_id: string
 ): unit;
 
@@ -65,15 +93,31 @@ function play_age_signals_test_set_error(
 // Enums
 
 [global, bind = typed_gml]
-enum PlayAgeSignalsVerificationStatus:int32
+enum PlayAgeSignalsStatus:int32
 {
     None = -1,
-    Verified = 0,
-    Supervised = 1,
-    SupervisedApprovalPending = 2,
-    SupervisedApprovalDenied = 3,
-    Unknown = 4,
-    Declared = 5,
+    Shared = 0,
+    NotShared = 1,
+    VerificationRequired = 2,
+}
+
+[global, bind = typed_gml]
+enum PlayAgeSignalsAgeRangeSource:int32
+{
+    None = -1,
+    TierA = 0,
+    TierB = 1,
+    TierC = 2,
+    TierD = 3,
+}
+
+[global, bind = typed_gml]
+enum PlayAgeSignalsSignificantChangeStatus:int32
+{
+    None = -1,
+    Approved = 0,
+    Pending = 1,
+    Declined = 2,
 }
 
 [global, bind = typed_gml]

@@ -1,6 +1,7 @@
 package ${YYAndroidPackageName};
 
 import ${YYAndroidPackageName}.enums.*;
+import ${YYAndroidPackageName}.records.PlayAgeSignalsAccessResult;
 import ${YYAndroidPackageName}.records.PlayAgeSignalsResult;
 import ${YYAndroidPackageName}.GMExtWire.GMFunction;
 
@@ -8,6 +9,8 @@ import android.app.Activity;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.play.agesignals.AgeSignalsAccessRequest;
+import com.google.android.play.agesignals.AgeSignalsAccessResult;
 import com.google.android.play.agesignals.AgeSignalsException;
 import com.google.android.play.agesignals.AgeSignalsManager;
 import com.google.android.play.agesignals.AgeSignalsManagerFactory;
@@ -62,6 +65,57 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
         }
 
         return mAgeSignalsManager != null;
+    }
+
+    @Override
+    public void play_age_signals_request_access(GMFunction callback) {
+        if (!play_age_signals_init()) {
+            if (callback != null) {
+                callback.call(makeAccessErrorResult(
+                    PlayAgeSignalsErrorCode.InternalError,
+                    "Failed to initialize Play Age Signals manager"
+                ));
+            }
+            return;
+        }
+
+        AgeSignalsAccessRequest request = AgeSignalsAccessRequest.builder()
+            .setActivity(activity)
+            .build();
+
+        if (mUseFakeManager) {
+            if (mFakeAgeSignalsManager == null) {
+                if (callback != null) {
+                    callback.call(makeAccessErrorResult(
+                        PlayAgeSignalsErrorCode.InternalError,
+                        "FakeAgeSignalsManager is not initialized"
+                    ));
+                }
+                return;
+            }
+
+            mFakeAgeSignalsManager
+                .requestAgeSignalsAccess(request)
+                .addOnSuccessListener(result -> handleAccessSuccess(callback, result))
+                .addOnFailureListener(exception -> handleAccessFailure(callback, exception));
+
+            return;
+        }
+
+        if (mAgeSignalsManager == null) {
+            if (callback != null) {
+                callback.call(makeAccessErrorResult(
+                    PlayAgeSignalsErrorCode.InternalError,
+                    "AgeSignalsManager is not initialized"
+                ));
+            }
+            return;
+        }
+
+        mAgeSignalsManager
+            .requestAgeSignalsAccess(request)
+            .addOnSuccessListener(result -> handleAccessSuccess(callback, result))
+            .addOnFailureListener(exception -> handleAccessFailure(callback, exception));
     }
 
     @Override
@@ -122,11 +176,28 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
     }
 
     @Override
+    public void play_age_signals_test_set_access_result(PlayAgeSignalsStatus status) {
+        if (!mUseFakeManager) return;
+        if (!play_age_signals_init()) return;
+        if (mFakeAgeSignalsManager == null) return;
+
+        Integer statusValue = mapAgeSignalsStatusValue(status);
+        if (statusValue == null) return;
+
+        AgeSignalsAccessResult result = AgeSignalsAccessResult.builder()
+            .setAgeSignalsStatus(statusValue)
+            .build();
+
+        mFakeAgeSignalsManager.setNextAgeSignalsAccessResult(result);
+    }
+
+    @Override
     public void play_age_signals_test_set_result(
-        PlayAgeSignalsVerificationStatus status,
+        PlayAgeSignalsAgeRangeSource age_range_source,
         int age_lower,
         int age_upper,
-        double approval_date_ms,
+        PlayAgeSignalsSignificantChangeStatus significant_change_status,
+        double significant_change_approval_date_ms,
         String install_id
     ) {
         if (!mUseFakeManager) return;
@@ -135,11 +206,9 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
 
         AgeSignalsResult.Builder builder = AgeSignalsResult.builder();
 
-        int status_value = status.value();
-
-        // None (-1) means: do not set user status
-        if (status_value >= 0) {
-            builder.setUserStatus(status_value);
+        Integer ageRangeSourceValue = mapAgeRangeSourceValue(age_range_source);
+        if (ageRangeSourceValue != null) {
+            builder.setAgeRangeSource(ageRangeSourceValue);
         }
 
         if (age_lower >= 0) {
@@ -150,8 +219,16 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             builder.setAgeUpper(age_upper);
         }
 
-        if (approval_date_ms >= 0.0) {
-            builder.setMostRecentApprovalDate(new Date((long) approval_date_ms));
+        Integer significantChangeStatusValue =
+            mapSignificantChangeStatusValue(significant_change_status);
+        if (significantChangeStatusValue != null) {
+            builder.setSignificantChangeStatus(significantChangeStatusValue);
+        }
+
+        if (significant_change_approval_date_ms >= 0.0) {
+            builder.setSignificantChangeApprovalDate(
+                new Date((long) significant_change_approval_date_ms)
+            );
         }
 
         if (install_id != null && !install_id.isEmpty()) {
@@ -172,6 +249,18 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
         );
     }
 
+    private void handleAccessSuccess(GMFunction callback, AgeSignalsAccessResult result) {
+        if (callback == null) return;
+        callback.call(makeAccessSuccessResult(result));
+    }
+
+    private void handleAccessFailure(GMFunction callback, Exception exception) {
+        if (callback == null) return;
+
+        ErrorInfo errorInfo = getErrorInfo(exception);
+        callback.call(makeAccessErrorResult(errorInfo.code, errorInfo.message));
+    }
+
     private void handleSuccess(GMFunction callback, AgeSignalsResult result) {
         if (callback == null) return;
         callback.call(makeSuccessResult(result));
@@ -180,6 +269,11 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
     private void handleFailure(GMFunction callback, Exception exception) {
         if (callback == null) return;
 
+        ErrorInfo errorInfo = getErrorInfo(exception);
+        callback.call(makeErrorResult(errorInfo.code, errorInfo.message));
+    }
+
+    private ErrorInfo getErrorInfo(Exception exception) {
         PlayAgeSignalsErrorCode errorCode = PlayAgeSignalsErrorCode.InternalError;
         String message = "Unknown Play Age Signals error";
 
@@ -194,28 +288,54 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             message = exception.getMessage();
         }
 
-        callback.call(makeErrorResult(errorCode, message));
+        return new ErrorInfo(errorCode, message);
+    }
+
+    private PlayAgeSignalsAccessResult makeAccessSuccessResult(AgeSignalsAccessResult result) {
+        return new PlayAgeSignalsAccessResult(
+            true,
+            mapAgeSignalsStatusEnum(result.ageSignalsStatus()),
+            PlayAgeSignalsErrorCode.NoError,
+            ""
+        );
+    }
+
+    private PlayAgeSignalsAccessResult makeAccessErrorResult(
+        PlayAgeSignalsErrorCode errorCode,
+        String message
+    ) {
+        return new PlayAgeSignalsAccessResult(
+            false,
+            PlayAgeSignalsStatus.None,
+            errorCode,
+            message != null ? message : ""
+        );
     }
 
     private PlayAgeSignalsResult makeSuccessResult(AgeSignalsResult result) {
         return new PlayAgeSignalsResult(
             true,
-            mapVerificationStatusEnum(result.userStatus()),
+            mapAgeRangeSourceEnum(result.ageRangeSource()),
             nullableInt(result.ageLower(), -1),
             nullableInt(result.ageUpper(), -1),
-            nullableDateToMs(result.mostRecentApprovalDate()),
+            mapSignificantChangeStatusEnum(result.significantChangeStatus()),
+            nullableDateToMs(result.significantChangeApprovalDate()),
             safeString(result.installId()),
             PlayAgeSignalsErrorCode.NoError,
             ""
         );
     }
 
-    private PlayAgeSignalsResult makeErrorResult(PlayAgeSignalsErrorCode errorCode, String message) {
+    private PlayAgeSignalsResult makeErrorResult(
+        PlayAgeSignalsErrorCode errorCode,
+        String message
+    ) {
         return new PlayAgeSignalsResult(
             false,
-            PlayAgeSignalsVerificationStatus.None,
+            PlayAgeSignalsAgeRangeSource.None,
             -1,
             -1,
+            PlayAgeSignalsSignificantChangeStatus.None,
             -1.0,
             "",
             errorCode,
@@ -223,32 +343,133 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
         );
     }
 
-    private PlayAgeSignalsVerificationStatus mapVerificationStatusEnum(@Nullable Integer status) {
+    private PlayAgeSignalsStatus mapAgeSignalsStatusEnum(@Nullable Integer status) {
         if (status == null) {
-            return PlayAgeSignalsVerificationStatus.None;
+            return PlayAgeSignalsStatus.None;
         }
 
         switch (status) {
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.VERIFIED:
-                return PlayAgeSignalsVerificationStatus.Verified;
+            case com.google.android.play.agesignals.model.AgeSignalsStatus.SHARED:
+                return PlayAgeSignalsStatus.Shared;
 
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED:
-                return PlayAgeSignalsVerificationStatus.Supervised;
+            case com.google.android.play.agesignals.model.AgeSignalsStatus.NOT_SHARED:
+                return PlayAgeSignalsStatus.NotShared;
 
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED_APPROVAL_PENDING:
-                return PlayAgeSignalsVerificationStatus.SupervisedApprovalPending;
-
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.SUPERVISED_APPROVAL_DENIED:
-                return PlayAgeSignalsVerificationStatus.SupervisedApprovalDenied;
-
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.UNKNOWN:
-                return PlayAgeSignalsVerificationStatus.Unknown;
-
-            case com.google.android.play.agesignals.model.AgeSignalsVerificationStatus.DECLARED:
-                return PlayAgeSignalsVerificationStatus.Declared;
+            case com.google.android.play.agesignals.model.AgeSignalsStatus.VERIFICATION_REQUIRED:
+                return PlayAgeSignalsStatus.VerificationRequired;
 
             default:
-                return PlayAgeSignalsVerificationStatus.None;
+                return PlayAgeSignalsStatus.None;
+        }
+    }
+
+    @Nullable
+    private Integer mapAgeSignalsStatusValue(@Nullable PlayAgeSignalsStatus status) {
+        if (status == null) return null;
+
+        switch (status) {
+            case Shared:
+                return com.google.android.play.agesignals.model.AgeSignalsStatus.SHARED;
+
+            case NotShared:
+                return com.google.android.play.agesignals.model.AgeSignalsStatus.NOT_SHARED;
+
+            case VerificationRequired:
+                return com.google.android.play.agesignals.model.AgeSignalsStatus.VERIFICATION_REQUIRED;
+
+            case None:
+            default:
+                return null;
+        }
+    }
+
+    private PlayAgeSignalsAgeRangeSource mapAgeRangeSourceEnum(@Nullable Integer source) {
+        if (source == null) {
+            return PlayAgeSignalsAgeRangeSource.None;
+        }
+
+        switch (source) {
+            case com.google.android.play.agesignals.model.AgeRangeSource.TIER_A:
+                return PlayAgeSignalsAgeRangeSource.TierA;
+
+            case com.google.android.play.agesignals.model.AgeRangeSource.TIER_B:
+                return PlayAgeSignalsAgeRangeSource.TierB;
+
+            case com.google.android.play.agesignals.model.AgeRangeSource.TIER_C:
+                return PlayAgeSignalsAgeRangeSource.TierC;
+
+            case com.google.android.play.agesignals.model.AgeRangeSource.TIER_D:
+                return PlayAgeSignalsAgeRangeSource.TierD;
+
+            default:
+                return PlayAgeSignalsAgeRangeSource.None;
+        }
+    }
+
+    @Nullable
+    private Integer mapAgeRangeSourceValue(@Nullable PlayAgeSignalsAgeRangeSource source) {
+        if (source == null) return null;
+
+        switch (source) {
+            case TierA:
+                return com.google.android.play.agesignals.model.AgeRangeSource.TIER_A;
+
+            case TierB:
+                return com.google.android.play.agesignals.model.AgeRangeSource.TIER_B;
+
+            case TierC:
+                return com.google.android.play.agesignals.model.AgeRangeSource.TIER_C;
+
+            case TierD:
+                return com.google.android.play.agesignals.model.AgeRangeSource.TIER_D;
+
+            case None:
+            default:
+                return null;
+        }
+    }
+
+    private PlayAgeSignalsSignificantChangeStatus mapSignificantChangeStatusEnum(
+        @Nullable Integer status
+    ) {
+        if (status == null) {
+            return PlayAgeSignalsSignificantChangeStatus.None;
+        }
+
+        switch (status) {
+            case com.google.android.play.agesignals.model.SignificantChangeStatus.APPROVED:
+                return PlayAgeSignalsSignificantChangeStatus.Approved;
+
+            case com.google.android.play.agesignals.model.SignificantChangeStatus.PENDING:
+                return PlayAgeSignalsSignificantChangeStatus.Pending;
+
+            case com.google.android.play.agesignals.model.SignificantChangeStatus.DECLINED:
+                return PlayAgeSignalsSignificantChangeStatus.Declined;
+
+            default:
+                return PlayAgeSignalsSignificantChangeStatus.None;
+        }
+    }
+
+    @Nullable
+    private Integer mapSignificantChangeStatusValue(
+        @Nullable PlayAgeSignalsSignificantChangeStatus status
+    ) {
+        if (status == null) return null;
+
+        switch (status) {
+            case Approved:
+                return com.google.android.play.agesignals.model.SignificantChangeStatus.APPROVED;
+
+            case Pending:
+                return com.google.android.play.agesignals.model.SignificantChangeStatus.PENDING;
+
+            case Declined:
+                return com.google.android.play.agesignals.model.SignificantChangeStatus.DECLINED;
+
+            case None:
+            default:
+                return null;
         }
     }
 
@@ -306,5 +527,15 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
 
     private String safeString(@Nullable String value) {
         return value != null ? value : "";
+    }
+
+    private static final class ErrorInfo {
+        final PlayAgeSignalsErrorCode code;
+        final String message;
+
+        ErrorInfo(PlayAgeSignalsErrorCode code, String message) {
+            this.code = code;
+            this.message = message;
+        }
     }
 }

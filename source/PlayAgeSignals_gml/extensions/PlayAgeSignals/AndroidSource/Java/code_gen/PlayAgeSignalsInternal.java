@@ -31,6 +31,17 @@ public abstract class PlayAgeSignalsInternal extends RunnerSocial implements Pla
         return __result ? 1.0 : 0.0;
     }
 
+    public double __EXT_NATIVE__play_age_signals_request_access(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        play_age_signals_request_access(callback);
+        return 0;
+    }
+
     public double __EXT_NATIVE__play_age_signals_check(ByteBuffer __arg_buffer, double __arg_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
@@ -48,12 +59,23 @@ public abstract class PlayAgeSignalsInternal extends RunnerSocial implements Pla
         return 0;
     }
 
+    public double __EXT_NATIVE__play_age_signals_test_set_access_result(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: status, type: enum PlayAgeSignalsStatus
+        PlayAgeSignalsStatus status = PlayAgeSignalsStatus.from(GMExtWire.readI32(__arg_buffer));
+
+        play_age_signals_test_set_access_result(status);
+        return 0;
+    }
+
     public double __EXT_NATIVE__play_age_signals_test_set_result(ByteBuffer __arg_buffer, double __arg_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
 
-        // field: status, type: enum PlayAgeSignalsVerificationStatus
-        PlayAgeSignalsVerificationStatus status = PlayAgeSignalsVerificationStatus.from(GMExtWire.readI32(__arg_buffer));
+        // field: age_range_source, type: enum PlayAgeSignalsAgeRangeSource
+        PlayAgeSignalsAgeRangeSource age_range_source = PlayAgeSignalsAgeRangeSource.from(GMExtWire.readI32(__arg_buffer));
 
         // field: age_lower, type: Int32
         int age_lower = GMExtWire.readI32(__arg_buffer);
@@ -61,13 +83,16 @@ public abstract class PlayAgeSignalsInternal extends RunnerSocial implements Pla
         // field: age_upper, type: Int32
         int age_upper = GMExtWire.readI32(__arg_buffer);
 
-        // field: approval_date_ms, type: Float64
-        double approval_date_ms = GMExtWire.readF64(__arg_buffer);
+        // field: significant_change_status, type: enum PlayAgeSignalsSignificantChangeStatus
+        PlayAgeSignalsSignificantChangeStatus significant_change_status = PlayAgeSignalsSignificantChangeStatus.from(GMExtWire.readI32(__arg_buffer));
+
+        // field: significant_change_approval_date_ms, type: Float64
+        double significant_change_approval_date_ms = GMExtWire.readF64(__arg_buffer);
 
         // field: install_id, type: String
         String install_id = GMExtWire.readString(__arg_buffer);
 
-        play_age_signals_test_set_result(status, age_lower, age_upper, approval_date_ms, install_id);
+        play_age_signals_test_set_result(age_range_source, age_lower, age_upper, significant_change_status, significant_change_approval_date_ms, install_id);
         return 0;
     }
 
