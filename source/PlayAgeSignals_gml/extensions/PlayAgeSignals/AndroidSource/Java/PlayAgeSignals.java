@@ -22,8 +22,6 @@ import java.util.Date;
 
 public class PlayAgeSignals extends PlayAgeSignalsInternal {
 
-    private final Activity activity = RunnerActivity.CurrentActivity;
-
     private AgeSignalsManager mAgeSignalsManager = null;
     private FakeAgeSignalsManager mFakeAgeSignalsManager = null;
 
@@ -42,8 +40,15 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             }
 
             if (mAgeSignalsManager == null) {
-                mAgeSignalsManager =
-                    AgeSignalsManagerFactory.create(activity.getApplicationContext());
+                Activity currentActivity = getCurrentActivity();
+                if (currentActivity == null) {
+                    mInitialized = false;
+                    return false;
+                }
+
+                mAgeSignalsManager = AgeSignalsManagerFactory.create(
+                    currentActivity.getApplicationContext()
+                );
             }
 
             mInitialized = (mAgeSignalsManager != null);
@@ -79,8 +84,19 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             return;
         }
 
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity == null) {
+            if (callback != null) {
+                callback.call(makeAccessErrorResult(
+                    PlayAgeSignalsErrorCode.InternalError,
+                    "No active Android Activity is available"
+                ));
+            }
+            return;
+        }
+
         AgeSignalsAccessRequest request = AgeSignalsAccessRequest.builder()
-            .setActivity(activity)
+            .setActivity(currentActivity)
             .build();
 
         if (mUseFakeManager) {
@@ -512,6 +528,19 @@ public class PlayAgeSignals extends PlayAgeSignalsInternal {
             default:
                 return PlayAgeSignalsErrorCode.InternalError;
         }
+    }
+
+    @Nullable
+    private Activity getCurrentActivity() {
+        Activity currentActivity = RunnerActivity.CurrentActivity;
+
+        if (currentActivity == null ||
+            currentActivity.isFinishing() ||
+            currentActivity.isDestroyed()) {
+            return null;
+        }
+
+        return currentActivity;
     }
 
     private int nullableInt(@Nullable Integer value, int fallback) {
