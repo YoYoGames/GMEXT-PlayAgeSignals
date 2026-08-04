@@ -53,8 +53,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"room_play_age_signals_fake","path":"rooms/room_play_age_signals_fake/room_play_age_signals_fake.yy",},},
     {"roomId":{"name":"room_play_age_signals","path":"rooms/room_play_age_signals/room_play_age_signals.yy",},},
+    {"roomId":{"name":"room_play_age_signals_fake","path":"rooms/room_play_age_signals_fake/room_play_age_signals_fake.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[
